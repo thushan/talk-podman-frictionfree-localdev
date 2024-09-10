@@ -13,7 +13,7 @@ https://podman-desktop.io/img/logo.svg
 You can open this project within VSCode and preview internally or externally the `index.html` file which includes the full presentation slides + memes & examples.
 
 
-[![Operating Systems](https://img.shields.io/badge/View-Presentation%20Online%20Right%20Now-informational?style=for-the-badge)](https://htmlpreview.github.io/?https://github.com/thushan/talk-podman-frictionfree-localdev/blob/main/index.html)
+[![Presentation Preview](https://img.shields.io/badge/View-Presentation%20Online-informational?style=for-the-badge)](https://thushan.github.io/talk-podman-frictionfree-localdev/)
 
 ## Changelog
 This talk has been revised over the years - whilst the content and overall idea has stayed relatively the same.
