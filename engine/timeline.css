@@ -1,0 +1,85 @@
+.timeline-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.timeline {
+    position: relative;
+    width: 100%;
+    height: 100px;
+    background-color: rgba(66, 175, 250, 0.2);
+    border-bottom: 2px solid #42affa;
+    overflow: visible;
+}
+.year-marker {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: rgba(231, 173, 82, 0.3);
+}
+.decade-marker {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+}
+.decade-label-bottom {
+    position: absolute;
+    top: 100%;
+    transform: translateX(-50%);
+    font-size: 0.7em;
+    color: #e7ad52;
+    text-align: center;
+    width: 40px;
+}
+.event {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #e7ad52;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.event:hover, .event.active {
+    transform: translate(-50%, -50%) scale(1.5);
+    background: #ff6b6b;
+}
+.content-area {
+    flex-grow: 1;
+    display: flex;
+    padding: 40px 20px 20px;
+    gap: 20px;
+}
+.image-area {
+    width: 40%;
+    background-color: rgba(66, 175, 250, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.image-area img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+.text-area {
+    width: 60%;
+}
+.text-area.full-width {
+    width: 100%;
+}
+.event-title {
+    font-size: 1em;
+    color: #42affa;
+    margin-bottom: 10px;
+}
+.event-description {
+    font-size: 0.8em;
+    color: #e7ad52;
+    text-align: left; 
+}

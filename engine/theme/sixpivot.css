@@ -53,6 +53,11 @@ section.has-light-background, section.has-light-background h1, section.has-light
   --r-link-color-hover: #61a462;
   --r-selection-background-color: #d33682;
   --r-selection-color: #fff;
+  --r-tab-background-color: #333;
+  --r-tab-active-color: #fff;
+  --r-tab-content-background-color: #1D1F21;
+  --r-tab-content-font-size: 22px;
+  --r-code-content-background-color: #1D1F21;
 }
 
 .reveal-viewport {

@@ -1,0 +1,125 @@
+/**
+ * https://codepen.io/htmlcssfreebies/pen/WNpVeRK
+ */
+/**
+ * Tabs Container
+ */
+ .tabs-container {
+	padding: 2rem;
+}
+
+/**
+ * Tabs Block
+ */
+.tabs-block {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/**
+ * Tabs
+ */
+.tabs {
+	display: flex;
+	flex-wrap: wrap;
+	width: 100%;
+}
+.tabs pre {
+    font-size: 1.125rem;
+    width: 100%;
+    margin: 0;
+    box-shadow: none;
+    background-color: var(--r-code-content-background-color);
+}
+.tabs code {    
+    background-color: var(--r-code-content-background-color);
+}
+.tabs label {
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 1rem 2rem;
+	margin-right: 0.0625rem;
+	cursor: pointer;
+	background-color: #000;
+	color: #fff;
+	font-family: Roboto, sans-serif;
+	font-size: 1.2rem;
+	font-weight: 700;
+	transition: background-color ease 0.3s;
+}
+
+.tabs label .material-icons {
+	margin-right: 0.3rem;
+}
+
+.tabs .tab {
+	flex-grow: 1;
+	width: 100%;
+	height: 100%;
+	display: none;
+	padding: 1rem 2rem;
+	color: var(--r-main-color);
+	background-color: var(--r-tab-content-background-color);
+	box-shadow: 0 10px 10px rgba(0, 0, 0, 0.4);
+}
+
+.content {
+	font-size: var(--r-tab-content-font-size);
+
+}
+.content li {
+    list-style-type: none;
+    align-items: left;
+    padding: 0;
+}
+
+.tabs .tab > *:not(:last-child) {
+	margin-bottom: 0.8rem;
+}
+
+.tabs [type=radio] {
+	display: none;
+}
+
+.tabs [type=radio]:checked + label {
+	background-color: var(r-example-meta-pre-colour);
+	color: var(--r-heading-color);
+	border-top: 4px solid var(--r-link-color-hover);
+	box-shadow: 0 10px 10px rgba(0, 0, 0, 0.4);
+}
+
+.tabs [type=radio]:checked + label + .tab {
+	display: block;
+}
+@media (min-width: 768px) {
+
+	body {
+		font-size: 1.125rem;
+	}
+
+	.tabs-container {
+		padding: 4rem 4rem;
+	}
+
+	.tabs label {
+		order: 1;
+		width: auto;
+	}
+
+	.tabs .tab {
+		order: 9;
+	}
+
+	.tabs [type=radio]:checked + label {
+		border-bottom: none;
+	}
+}
+@media (min-width: 992px) {
+
+	.tabs {
+		width: 800px;
+	}
+}

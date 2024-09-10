@@ -69,3 +69,17 @@ a.learn-code {
 .reveal .star::before {
     content: "⭐";
 }
+.reveal section.img_container {
+    width: 100%;
+    height: 70%;
+    margin: 0;
+    padding: 0;
+}
+.reveal section img {
+    display: block;
+    margin: auto;
+    height: auto;
+    max-height: 100%;
+    width: auto;
+    max-width: 100%;
+}

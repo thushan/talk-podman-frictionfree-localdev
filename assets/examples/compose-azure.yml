@@ -1,0 +1,53 @@
+version: '3.8'
+services:
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    ports:
+      - "${AZURITE_BLOB_PORT:-10000}:10000"
+      - "${AZURITE_QUEUE_PORT:-10001}:10001"
+      - "${AZURITE_TABLE_PORT:-10002}:10002"
+    volumes:
+      - azurite_data:/data
+    command: "azurite --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0"
+
+  cosmosdb:
+    image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator
+    ports:
+      - "${COSMOS_PORT:-8081}:8081"
+    environment:
+      - AZURE_COSMOS_EMULATOR_PARTITION_COUNT=${COSMOS_PARTITION_COUNT:-10}
+      - AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE=true
+    volumes:
+      - cosmosdb_data:/data/db
+
+  azuresql:
+    image: mcr.microsoft.com/azure-sql-edge
+    environment:
+      - ACCEPT_EULA=1
+      - MSSQL_SA_PASSWORD=${SQL_SA_PASSWORD:-YourStrong@Passw0rd}
+    ports:
+      - "${SQL_PORT:-1433}:1433"
+    volumes:
+      - azuresql_data:/var/opt/mssql
+
+  webapp:
+    image: ${WEBAPP_IMAGE:-your-webapp-image:latest}
+    build: 
+      context: ./webapp
+      dockerfile: Dockerfile
+    ports:
+      - "${WEBAPP_PORT:-8080}:80"
+    environment:
+      - AZURE_STORAGE_CONNECTION_STRING=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1;
+      - COSMOS_DB_ENDPOINT=https://cosmosdb:${COSMOS_PORT:-8081}
+      - COSMOS_DB_KEY=C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==
+      - SQL_CONNECTION_STRING=Server=azuresql,${SQL_PORT:-1433};Database=${SQL_DATABASE:-MyDatabase};User Id=sa;Password=${SQL_SA_PASSWORD:-YourStrong@Passw0rd};
+    depends_on:
+      - azurite
+      - cosmosdb
+      - azuresql
+
+volumes:
+  azurite_data:
+  cosmosdb_data:
+  azuresql_data:

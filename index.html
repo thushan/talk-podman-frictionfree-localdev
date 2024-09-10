@@ -10,43 +10,1019 @@
 	<meta name="description" content="">
 	<meta name="author" content="Thushan Fernando">
 
-	<title>Fancy Title (2024)</title>
+	<title>Mastering Local Development with Podman</title>
 
 	<link rel="stylesheet" href="engine/reset.css">
 	<link rel="stylesheet" href="engine/reveal.css">
 	<link rel="stylesheet" href="engine/thushan.css">
-	<link rel="stylesheet" href="engine/theme/black.css" id="theme">
+	<link rel="stylesheet" href="engine/timeline.css">
+	<link rel="stylesheet" href="engine/theme/sixpivot.css" id="theme">
 	<link rel="stylesheet" href="engine/plugin/highlight/monokai.css" id="highlight-theme">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="engine/tabs.css">
 </head>
+<!--
+	References:
+	- https://forum.huawei.com/enterprise/en/types-of-virtualization-technology/thread/717860173504200704-667213860102352896
+	- https://katadata.co.id/berita/lifestyle/61af424a68d40/sejarah-internet-muncul-akibat-perang-dingin-as-dan-uni-soviet
+	- https://github.com/Azure/azure-cosmos-db-emulator-docker
+-->
 <body>
 	<div class="reveal">
 		<div class="slides">
 			<section data-markdown>
-				## Fancy title
-				## Is fancy
-				Thushan Fernando
+				## Mastering Local Development with Podman
+				#### Friction-Free Development with Containers
 
 				![Splash Image](assets/img/memes/chris-pratt-omg.gif)
 
 				[@thushanfernando](https://twitter.com/thushanfernando)
 
 				[github.com/thushan](https://github.com/thushan)
+				
 			</section>
-
 			<section>
-				<h3>Flowchart</h3>
-				<div class="mermaid">
-				  <pre>
-					%%{init: {'theme': 'dark', 'themeVariables': { 'darkMode': true }}}%%
-					flowchart TD
-					  A[Start] --> B{Is it?};
-					  B -- Yes --> C[OK];
-					  C --> D[Rethink];
-					  D --> B;
-					  B -- No ----> E[End];
-				  </pre>
-				</div>
-			  </section>
+				<h2>Agenda</h2>
+				<ol>
+					<li class="fragment grow">Introduction</li>
+					<li class="fragment grow">Understanding Containers</li>
+					<li class="fragment grow">Friction-Free Development</li>
+					<li class="fragment grow">Setting Up Podman</li>
+					<li class="fragment grow">Podman in Action</li>
+					<li class="fragment grow">Core Podman Concepts</li>
+					<li class="fragment grow">Advanced Container Concepts</li>
+					<li class="fragment grow">Kubernetes Integration</li>
+					<li class="fragment grow">Compatibility and Limitations</li>
+					<li class="fragment grow">Best Practices and Tips</li>
+					<li class="fragment grow">Q&A</li>
+				</ol>
+			</section>
+			<section>				
+				<section class="img_container">
+					<h3>Brief History of Virtualisation</h3>
+					<script>						
+						const timelineEvents = [
+							{ year: 1960, title: "Mainframe Virtualization", description: "The concept of virtualization is introduced in mainframe systems.", image: "assets/img/ibm-mainframe.jpg", imagePosition: "left" },
+							{ year: 1970, title: "IBM VM/370", description: "IBM releases VM/370, a groundbreaking virtualization system for mainframes.", image: "assets/img/ibm-vm370.png", imagePosition: "right" },
+							{ year: 1979, title: "Unix Chroot", description: "The chroot system call is introduced in Unix V7, laying the groundwork for container-like isolation." },
+							{ year: 1990, title: "x86 Virtualization", description: "Virtualization technology begins to be applied to x86 architecture.", image: "assets/diagrams/x86-virtualisation.excalidraw.png", imagePosition: "left" },
+							{ year: 2000, title: "FreeBSD Jails", description: "FreeBSD Jails, an early form of container technology, is introduced." },
+							{ year: 2001, title: "Solaris Containers & VServer Linux", description: "Solaris Containers and VServer Linux are introduced, furthering container technology." },
+							{ year: 2004, title: "OpenVZ", description: "OpenVZ, an OS-level virtualization technology, is released." },
+							{ year: 2005, title: "Intel VT-x", description: "Intel releases VT-x instructions with Pentium 4 Processor." },
+							{ year: 2007, title: "Intel VT-d", description: "Intel extends VT-x instructions with VT-d for Directed-IO." },
+							{ year: 2008, title: "Linux Containers (LXC) & dotCloud", description: "LXC is introduced, and dotCloud (precursor to Docker) is founded.", image: "assets/diagrams/modernd-containers.excalidraw.png", imagePosition: "right" },
+							{ year: 2012, title: "Docker", description: "Docker is released, revolutionizing container technology and adoption.", image: "assets/img/docker-logo-banner.png", imagePosition: "left" },
+							{ year: 2019, title: "Podman", description: "Podman is introduced as a daemonless container engine, compatible with Docker.", image: "assets/img/podman-logo-banner.png", imagePosition: "right" }
+						];
+					</script>
+					<div class="timeline-container">
+						<div class="timeline"></div>
+						<div class="content-area">
+							<div class="image-area"></div>
+							<div class="text-area">
+								<div class="event-title"></div>
+								<div class="event-description"></div>
+							</div>
+						</div>
+				</section>
+			</section>
+			<section>
+				<section class="img_container">
+					<h3>Virtualisation vs Containerisation</h3>
+					<img src="assets/img/memes/andy-vm-vs-container.png"/>
+				</section>				
+				<section>
+					<h3>Virtualisation vs Containerisation</h3>
+					<img src="assets/diagrams/virtualisation-vs-containerisation.excalidraw.png" class="fragment fade-in"/>
+				</section>				
+				<section class="img_container">
+					<h3>Virtualisation - IIS days?</h3>
+					<img src="assets/diagrams/x86-virtualisation.excalidraw.png" />
+				</section>				
+				<section class="img_container">
+					<h3>Containers - Cloud, Serverless, just nice</h3>
+					<img src="assets/diagrams/modernd-containers.excalidraw.png" />
+				</section>
+			</section>
+			<section>
+				<h2>What are Containers?</h2>
+				<ul>
+					<li class="fragment">Lightweight, standalone, executable packages</li>
+					<li class="fragment">Include everything needed to run an application</li>
+					<li class="fragment">Code, runtime, system tools, libraries, configuration etc</li>
+					<li class="fragment">They're all kept in layers, small, isolated & efficient</li>
+					<li class="fragment">Consistent environment across dev, test and production</li>
+					<li class="fragment">Isolate software from its surroundings</li>
+					<li class="fragment">Portable (*) and easy to scale - when done right</li>
+				</ul>
+			</section>
+			<section>				
+				<section>
+					<img src="assets/img/docker-logo-banner.png"/><br/>
+					<ul>
+						<li>Develop, ship, and run applications.</li>
+						<li>Part of the Moby Project.</li>
+						<li>Acquired by Mirantis in 2019.</li>
+						<li>Commercial License required for Enterprise.</li>
+				</section>
+				<section>
+					<h3>The Birth of Docker</h3>
+					<img src="assets/img/memes/the-birth-of-docker.jpg" class="fragment" /><br/>
+				</section>
+				<section>
+					<img src="assets/img/podman-logo-banner.png"/><br/>
+					<ul>
+						<li>Daemonless container engine.</li>
+						<li>Drop-in replacement for Docker.</li>
+						<li>Part of the Red Hat ecosystem.</li>
+						<li>Open Source and Free.</li>
+					</ul>
+				</section>
+			</section>
+			<section>
+				<section>
+					<h3>Starting a new project?</h3>
+					<img src="assets/img/better-off-ted_jabberwocky.jpg" class="fragment" />
+					<pre class="console-commands highlight-yellow fragment">
+						$ git clone https://github.com/veridian/jabberwocky.git
+					</pre>
+					<pre class="console-commands highlight-yellow fragment">
+						$ cd jaberwocky
+					</pre>
+					<pre class="console-commands highlight-yellow fragment">
+						$ more getting-started.md
+
+							Please install the following dependencies:
+							* SQL Server 2007 (you'll need our MSDN License)
+							* Redis Server (get this from our K:\ drive)
+							* RabbitMQ Server (but find v2.4.1)
+							* IIS 10 /w ASP.NET v4.1.2 (ask Jimmy for admin perms)
+							* WCF Runtime Utilities
+							* SQL Management Studio (not the latest tho)
+							* Visual Studio 2019 with SQL Server Tools
+							...
+							Add your username to AD under group DEV-PEEPS
+							Email support for access to the test Mailserver
+					</pre>
+				</section>
+				<section>
+					<h3>What the heck!</h3>					
+					<img src="assets/img/memes/friction-everywhere-install-dependencies.jpg" class="fragment" />
+				</section>
+				<section>
+					<h3>What is Friction-Free Development?</h3>
+					<ul>
+						<li class="fragment">Automate & Script as much as possible.</li>
+						<li class="fragment">Fast and easy onboarding.</li>
+						<li class="fragment">Minimal setup, less dependencies, no installs</li>
+						<li class="fragment">Minimal configuration - sane defaults.</li>
+						<li class="fragment">Easy to tear down and rebuild</li>
+						<li class="fragment">Reproducible builds</li>
+						<li class="fragment">Most times just		
+							<pre class="console-commands highlight-yellow">
+								$ ./setup-local.sh
+								$ podman compose up -d
+							</pre>
+						</li>
+					</ul>
+					<ul>
+						<li class="fragment"><code>less</code> &gt; <code>more</code></li>
+					</ul>
+				</section>
+				<section>
+					<h3>Why Containerise for Local Development?</h3>
+					<ul>
+						<li class="fragment">Reduce costs
+							<small class="fragment">- Minimise cloud resource usage during development</small>
+						</li>
+						<li class="fragment">Reduce friction
+							<small class="fragment">- Consistent environment across team members</small>
+						</li>
+						<li class="fragment">Improve productivity
+							<small class="fragment">- Quick setup and teardown of development environments</small>
+						</li>
+						<li class="fragment">Enhance collaboration
+							<small class="fragment">- Easily share and reproduce development setups</small>
+						</li>
+						<li class="fragment">Streamline CI/CD pipelines
+							<small class="fragment">- Test in environments mirroring production</small>
+						</li>
+						<li class="fragment">Facilitate microservices development
+							<small class="fragment">- Isolate and manage individual services locally</small>
+						</li>
+						<li class="fragment">Enable easy scaling simulation
+							<small class="fragment">- Test application behavior under various loads</small>
+						</li>
+					</ul>
+					<p class="fragment">
+						<small>Containerization: Empowering developers with efficient, consistent, and scalable local environments</small>
+					</p>
+				</section>
+				<section>
+					<h3>What can we containerise?</h3>
+					<ul>
+						<li class="fragment">Databases - Postgres, MySQL, SqlServer, CosmosDB</li>
+						<li class="fragment">Web Servers</li>
+						<li class="fragment">API Servers - mock Services etc.</li>
+						<li class="fragment">Message Brokers - Kafka, ActiveMQ, Amazon SQS</li>
+						<li class="fragment">Caching Servers - Redis</li>
+						<li class="fragment">Monitoring Tools - Logstash, OpenTelemetry, Seq</li>
+						<li class="fragment">CI/CD Tools</li>
+						<li class="fragment">Development Tools</li>
+						<li class="fragment">... and more</li>
+					</ul>
+				</section>
+				<section>
+					<h3>Why it's not the silver bullet (Cloud: Azure)</h3>
+					<ul>
+						<li class="fragment">
+							Not all services are containerised - <small class="fragment">Eg. Azure ServiceBus</small><br/>
+							<span class="fragment">
+								...the bus, the bus <a href="https://github.com/Azure/azure-service-bus/issues/223#issuecomment-2123141525">is coming!</a> (EoY 2024)
+							</span>
+						</li>
+						<li class="fragment">Not all services are container friendly</li>
+						<li class="fragment">Not all services are container ready</li>
+						<li class="fragment">Not all services are container optimised</li>
+						<li class="fragment">No 'localstack' for Azure - yet!</li>
+					</ul>
+				</section>
+				<section>
+					<h3>Why it's not the silver bullet (Cloud: AWS)</h3>
+					<ul>
+						<li class="fragment">
+							Not all services are containerised - <small class="fragment">Eg. AWS Lambda</small><br/>
+							<span class="fragment">
+								...but you can use <a href="https://github.com/aws/aws-sam-cli">AWS SAM CLI</a> for local Lambda development
+							</span>
+						</li>
+						<li class="fragment">Not all services are container friendly - <small class="fragment">Eg. Amazon S3</small></li>
+						<li class="fragment">Not all services are container ready - <small class="fragment">Eg. Amazon DynamoDB</small></li>
+						<li class="fragment">Not all services are container optimised - <small class="fragment">Eg. Amazon RDS</small></li>
+						<li class="fragment">
+							Some services have no local equivalent - <small class="fragment">Eg. AWS CloudFormation</small><br/>
+							<span class="fragment">
+								...though tools like <a href="https://github.com/localstack/localstack">LocalStack</a> can help simulate some AWS services
+							</span>
+						</li>
+					</ul>
+				</section>
+			</section>
+			<section>
+				<section class="tabs-wrapper">
+					<h3>Setting up Podman</h3>
+					<div class="tabs-container">
+						<div class="tabs-block">
+							<div class="tabs">
+								<input type="radio" name="tabs" id="tab1" checked="checked" />
+								<label for="tab1"><i class="fa fa-windows"></i>&nbsp;Windows</label>
+								<div class="tab">									
+									<pre>
+										<code>
+											# Install Podman with Choco
+											> choco install podman-desktop
+
+											# Install Podman with Scoop
+											> scoop bucket add extras
+											> scoop install podman-desktop
+
+											# Install Podman with Winget
+											> winget install -e --id RedHat.Podman-Desktop
+
+											# Run a container
+											> podman run -it --rm alpine /bin/sh
+										</code>
+									</pre>
+								</div>	
+								<input type="radio" name="tabs" id="tab2" />
+								<label for="tab2"><i class="fa fa-apple"></i>&nbsp;macOS</label>
+								<div class="tab">									
+									<pre>
+										<code>
+											# Install Podman with Brew
+											> brew install podman-desktop
+
+											# Run a container
+											> podman run -it --rm alpine /bin/sh
+										</code>
+									</pre>
+								</div>	
+								<input type="radio" name="tabs" id="tab3" />
+								<label for="tab3"><i class="fa fa-linux"></i>&nbsp;Linux</label>								
+								<div class="tab">									
+									<pre>
+										<code>
+											# Install Podman (Debian variants)
+											> sudo apt install podman
+
+											# Install Podman via Flatpak
+											> flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flathub.flatpakrepo
+											> flatpak install --user flathub io.podman_desktop.PodmanDesktop
+
+											# Install Podman via Snap
+											> sudo snap install podman-desktop											
+
+											# Run a container
+											> podman run -it --rm alpine /bin/sh
+										</code>
+									</pre>
+								</div>	
+								<input type="radio" name="tabs" id="tab4" />
+								<label for="tab4"><i class="fa fa-home"></i>&nbsp;Manual</label>								
+								<div class="tab content">
+									<div>See <a href="https://podman-desktop.io/docs/installation">Podman Installation Instructions</a></div>
+									<ul>
+										<li><a href="https://podman-desktop.io/docs/installation/windows-install" target="_blank"><i class="fa fa-windows"></i>&nbsp;Windows</a></li>
+										<li><a href="https://podman-desktop.io/docs/installation/macos-install" target="_blank"><i class="fa fa-apple"></i>&nbsp;macOS</a></li>
+										<li><a href="https://podman-desktop.io/docs/installation/linux-install" target="_blank"><i class="fa fa-linux"></i>&nbsp;Linux</a></li>
+									</ul>
+								</div>	
+							</div>
+						</div>
+					</div>
+				</section>				
+				<section>
+					<h3>Podman Compose</h3>
+					<pre>
+						<code>
+							# Install Podman Compose
+							> podman plugin install podman-compose
+
+							# Check the version
+							> podman compose version
+							
+							# Run a Compose file
+							> podman compose up -d
+						</code>
+					</pre>
+					<ul class="resources">
+						<li><a href="https://www.redhat.com/sysadmin/podman-compose-docker-compose">Redhat: Podman Compose or Docker Compose</a></li>
+					</ul>
+				</section>
+				<section>
+					<h3>Lazy Docker</h3>
+					<img src="assets/img/lazydocker-demo.gif" />
+					<a href="https://github.com/jesseduffield/lazydocker">@jesseduffield/lazydocker</a>
+				</section>
+				<section>
+					<h3>Lazy Docker</h3>
+					Yeah you want this...
+					<pre>
+						<code>
+							# Windows
+							> scoop install lazydocker
+							> choco install lazydocker
+
+							# macOS
+							> brew install jesseduffield/lazydocker/lazydocker
+
+							# Linux
+							> sudo snap install lazydocker
+							> curl https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh | bash
+						</code>
+					</pre>
+				</section>
+			</section>
+			<section>
+				<section>
+					<h3>Using Podman in our workflow</h3>
+				</section>
+				<section>
+					<h2>Create a Podman Stack (Fatman Scoop!)</h2>
+					<ul>
+						<li class="fragment"><strong>Azurite</strong> emulates Azure Blob, Queue, and Table storage</li>
+						<li class="fragment"><strong>CosmosDB</strong> Emulator provides a local NoSQL database</li>
+						<li class="fragment"><strong>Azure SQL Edge</strong> offers a lightweight SQL Server for local development</li>
+						<li class="fragment">Web application container connects to all services</li>
+						<li class="fragment">Persistent volumes ensure data is retained between restarts</li>
+						<li class="fragment">Environment variables configure service connections</li>
+					</ul>
+				</section>
+				<section>
+					<h3>Azure Compose Stack</h3>
+					<code>compose.yml</code>
+					<pre style="width:100%"><code class="language-yaml" >
+	version: '3.8'
+	services:
+		azurite:
+			image: mcr.microsoft.com/azure-storage/azurite
+			ports:
+				- "10000:10000"  # Blob storage
+				- "10001:10001"  # Queue storage
+				- "10002:10002"  # Table storage
+			volumes:
+				- azurite_data:/data
+			command: "azurite --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0"
+	
+		cosmosdb:
+			image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator
+			ports:
+				- "8081:8081"
+			environment:
+				- AZURE_COSMOS_EMULATOR_PARTITION_COUNT=10
+				- AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE=true
+			volumes:
+				- cosmosdb_data:/data/db
+	
+		azuresql:
+			image: mcr.microsoft.com/azure-sql-edge
+			environment:
+				- ACCEPT_EULA=1
+				- MSSQL_SA_PASSWORD=YourStrong@Passw0rd
+			ports:
+				- "1433:1433"
+			volumes:
+				- azuresql_data:/var/opt/mssql
+	
+		webapp:
+			image: your-webapp-image:latest
+			ports:
+				- "8080:80"
+			environment:
+				- AzureWebJobsStorage=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;...
+				- CosmosDb__Endpoint=https://cosmosdb:8081
+				- CosmosDb__Key=C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==
+				- SqlConnectionString=Server=azuresql,1433;Database=MyDatabase;User Id=sa;Password=YourStrong@Passw0rd;
+			depends_on:
+				- azurite
+				- cosmosdb
+				- azuresql
+	
+	volumes:
+		azurite_data:
+		cosmosdb_data:
+		azuresql_data:</code></pre>
+				</section>				
+				<section>
+					<h2>Running the Azure Services Stack</h2>
+					<pre><code class="language-bash">
+				# Start the stack
+				podman compose up -d
+				
+				# View running containers
+				podman compose ps
+				
+				# Stop and remove the stack
+				podman compose down
+				
+				# Stop the stack but keep volumes
+				podman compose down --volumes</code></pre>
+				</section>
+				<section>
+					<h2>Update our configs!</h2>					
+					<pre><code class="language-json">
+{
+	"IsEncrypted": false,
+	"Values": {
+		"AzureWebJobsStorage": "UseDevelopmentStorage=true",
+		"AzureWebJobsDashboard": "UseDevelopmentStorage=true",
+		"SqlConnectionString": "Server=localhost,1433;Database=master;User Id=sa;Password=yourStrong(!)Password;"
+		"CosmosDBConnectionString": "AccountEndpoint=https://localhost:8081/;AccountKey=C2y6yDjf5/R+randomKey+randomKey+randomKey+randomKey+randomKey==;"
+	}
+}
+						  </code></pre>
+				</section>
+				<section class="img_container">
+					<h3>Party!</h3>
+					<img src="assets/img/memes/kid-meme.gif" />
+					<ul>
+						<li class="fragment">You've got a local Azure stack!</li>
+						<li class="fragment">No more cloud costs for dev!</li>
+						<li class="fragment">Easy to share with team!</li>
+						<li class="fragment">Easy to tear down and rebuild!</li>
+						<li class="fragment">Easy to scale!</li>
+						<li class="fragment">But wait, hangon...</li>
+					</ul>
+				</section>
+				<section>
+					<h3>Seeding data for Databases: Postgres</h3>
+					
+					<pre><code class="language-bash">
+	# Seed data into Postgres
+	podman exec -i postgres psql -U postgres -d mydatabase < /data/db/seed.sql
+				</code></pre>
+				<pre class="fragment"><code class="language-bash">
+postgres:
+	image: postgres
+	...
+	ports: 
+		- "5432:5432"
+	volumes: 
+	- ./db/_init.sql:/docker-entrypoint-initdb.d/init.sql
+				</code></pre>
+				</section>
+				<section>
+					<h3>Seeding data for Databases: Azure SQL Edge</h3>
+					
+					<pre><code class="language-bash">
+ # Seed data into Azure SQL Edge
+	podman exec -i azuresql /opt/mssql-tools/bin/sqlcmd -S localhost -U sa \
+		 -P YourStrong@Passw0rd -d MyDatabase -i /data/db/seed.sql
+				</code></pre>
+				</section>
+				<section>
+					<h3>Seeding data for Databases: Cosmos</h3>
+					<pre><code class="language-bash">
+				# Seed data into CosmosDB
+				podman exec -i cosmosdb mongoimport --db PlantDb \ 
+							--collection Plants --file /data/db/seed.json
+				</code></pre>
+				</section>
+			</section>
+			<section>
+				<section>
+					<h3>Podman Concepts</h3>
+					<ul>
+						<li class="fragment">Container Environment Variables</li>
+						<li class="fragment">Container Volumes</li>
+						<li class="fragment">Container Layers</li>
+					</ul>					
+				</section>
+			</section>
+			<section>
+				<section>
+					<h2>Environment Variables in Containers</h2>
+					<code>.env.example</code>
+					<pre><code class="language-bash">						
+			COSMOS_PORT=8089
+			SQL_PORT=1433
+			WEBAPP_PORT=8080
+						</code></pre>
+					<ul>
+						<li class="fragment">Key-value pairs for configuration</li>
+						<li class="fragment">Separate configuration from code</li>
+						<li class="fragment">Enable easy customization without rebuilding</li>
+						<li class="fragment">Crucial for maintaining security (e.g., storing secrets)</li>
+						<li class="fragment">Support different environments (dev, staging, prod)</li>
+					</ul>
+				</section>
+				
+				<section>
+					<h2>Setting Environment Variables</h2>
+					<pre><code class="language-bash">				
+				# At runtime
+				podman run -e MY_VAR=my_value my-image
+				
+				# In Compose file
+				environment:
+				  - MY_VAR=my_value
+				
+				# Using .env file with Podman
+				env_file:
+				  - .env
+
+				# Using .env file with Compose
+				podman-compose --env-file ./.env up</code></pre>
+				</section>
+				
+				<section>
+					<h2>Environment Variables in Compose</h2>
+					<ul>
+						<li class="fragment">Use a <code>.env.example</code> to describe the default variables</li>
+						<li class="fragment"><code>.env.example</code> is in the repo</li>
+						<li class="fragment">Exclude <code>.env</code> in version control</li>
+					</ul>
+					<div class="fragment"><code>.gitignore:</code>
+						<pre><code class="language-yaml">
+							.env
+						</code></pre>
+						<p>Avoid secrets leaking to VCS</p>
+					</div>
+					
+				</section>
+				<section>
+					<h2>Best Practices for Environment Variables</h2>
+					<ul>
+						<li class="fragment">Use for configuration that varies between environments</li>
+						<li class="fragment">Never store secrets in Dockerfiles or source control</li>
+						<li class="fragment">Use <code>.env.example</code> for env variables in VCS</li>
+						<li class="fragment">Document all required environment variables & put in template</li>
+						<li class="fragment">Provide default values for non-sensitive configurations</li>
+						<li class="fragment">Use <code>.env</code> files for local development, ignored in VCS</li>
+						<li class="fragment">In production, use secrets management systems</li>
+					</ul>
+				</section>
+				<section>
+					<h2>Accessing Environment Variables in Code</h2>
+					<pre><code class="language-python"># Python example
+				import os
+				
+				db_host = os.environ.get('DB_HOST', 'localhost')
+				db_port = int(os.environ.get('DB_PORT', 5432))
+				db_name = os.environ['DB_NAME']  # Raises KeyError if not set</code></pre>
+					<pre><code class="language-javascript">// Node.js example
+				const dbHost = process.env.DB_HOST || 'localhost';
+				const dbPort = parseInt(process.env.DB_PORT || '5432', 10);
+				const dbName = process.env.DB_NAME;</code></pre>
+				</section>
+				
+				<section>
+					<h2>Running the Updated Azure Services Stack</h2>
+					<pre><code class="language-bash"># Create a .env file
+				echo "WEBAPP_PORT=9000" > .env
+				echo "SQL_SA_PASSWORD=MySecurePassword123!" >> .env
+				
+				# Start the stack with custom environment
+				podman-compose --env-file .env up -d
+				
+				# Override a variable at runtime
+				podman-compose run -e WEBAPP_PORT=8080 webapp
+				
+				# View environment variables of a running container
+				podman exec webapp printenv</code></pre>
+				<ul>
+					<li class="fragment">Have a <code>.env.example</code> to find variables with sane defaults</li>
+				</ul>
+				</section>
+			</section>
+				<section>
+					<section>
+						<h2>Container Volumes</h2>
+						<ul>
+							<li class="fragment">Volumes are the preferred mechanism for persisting data in containers</li>
+							<li class="fragment">Independent of container lifecycle - data persists even when container is removed</li>
+							<li class="fragment">Can be shared and reused among multiple containers</li>
+							<li class="fragment">Managed by the container runtime (e.g., Podman, Docker) for better portability</li>
+							<li class="fragment">Provide better performance for I/O operations compared to bind mounts</li>
+							<li class="fragment">Support different drivers for various storage backends</li>
+						</ul>
+					</section>
+					<section>
+						<h3>Creating volumes</h3>
+						<pre>
+							<code>
+								# Create a volume
+								> podman volume create pgdata
+
+								# Run a container with a volume
+								> podman run -v pgdata:/var/lib/postgresql/data postgres:16
+							</code>
+						</pre>
+						<pre class="fragment">
+							<code>
+								version: '3.8'
+								services:
+								db:
+									image: postgres:16
+									environment:
+									...
+									volumes:
+									- pgdata:/var/lib/postgresql/data
+
+								volumes:
+									pgdata:
+							</code>
+						</pre>
+					</section>				
+					<section>
+						<h2>Working with Volumes in Podman</h2>
+						<pre><code class="language-bash">
+					# Create a volume
+					podman volume create myvolume
+					
+					# List volumes
+					podman volume ls
+					
+					# Inspect a volume
+					podman volume inspect myvolume
+					
+					# Use a volume in a container
+					podman run -v myvolume:/app/data myimage
+					
+					# Remove a volume
+					podman volume rm myvolume</code></pre>
+					</section>
+					
+					<section>
+						<h2>Volume Drivers in Podman</h2>
+						<ul>
+							<li><strong>local:</strong> Default driver, stores data on the host filesystem</li>
+							<li><strong>tmpfs:</strong> Temporary in-memory storage</li>
+							<li>Third-party drivers can be added for cloud storage, etc.</li>
+						</ul>
+						<pre><code class="language-bash">
+									# Create a tmpfs volume
+					podman volume create --driver tmpfs mytmpfs
+					
+					# Use a specific driver
+					podman volume create --driver local mylocal</code></pre>
+					</section>				
+					<section>
+						<h2>Volume Management in Podman Compose</h2>
+						<pre><code class="language-yaml">
+					version: '3'
+					services:
+						webapp:
+							image: mywebapp
+							volumes:
+							- appdata:/app/data
+							- /host/path:/app/config:ro
+					volumes:
+						appdata:
+							driver: local
+							driver_opts:
+							type: 'none'
+							o: 'bind'
+							device: '/path/on/host'</code></pre>
+					</section>                
+					<section>
+						<h2>Best Practices for Podman Volumes</h2>
+						<ul>
+							<li class="fragment">Use volumes for persistent data storage</li>
+							<li class="fragment">Implement regular backups of important volumes</li>
+							<li class="fragment">Use read-only mounts when possible for security</li>
+							<li class="fragment">Be cautious with host mounts in production environments</li>
+							<li class="fragment">Use volume labels for easier management and automation</li>
+							<li class="fragment">Consider using separate volumes for different types of data (e.g., logs, databases)</li>
+							<li class="fragment">Use <code>tmpfs</code> for high-io scenarios</li>
+						</ul>
+					</section>
+					<section>
+						<h2>Binding Host Volumes in Podman</h2>
+						<ul>
+							<li class="fragment">Mounts a specific path from the host into the container</li>
+							<li class="fragment">Provides direct access to host files / folders</li>
+							<li class="fragment">Useful for development and persistent data storage</li>
+							<li class="fragment">Can be read-only or read-write</li>
+							<li class="fragment">May require careful permission management</li>
+						</ul>
+					</section>
+					
+					<section>
+						<h2>Basic Host Volume Binding</h2>
+						<pre><code class="language-bash">
+					# Mount a host directory to a container
+					podman run -v /path/on/host:/path/in/container:Z my-image
+					
+					# Mount with read-only access
+					podman run -v /path/on/host:/path/in/container:ro,Z my-image
+					
+					# Use a relative path (current directory)
+					podman run -v ./local-data:/app/data:Z my-image</code></pre>
+						<p>The <code>:Z</code> option relabels the content for SELinux</p>
+					</section>
+					
+					<section>
+						<h2>Host Volumes in Podman Compose</h2>
+						<pre><code class="language-yaml">
+					version: '3'
+					services:
+						webapp:
+							image: my-webapp
+							volumes:
+							- ./config:/app/config:ro,Z
+							- ./logs:/app/logs:Z
+					database:
+						image: postgres:16.4
+						volumes:
+						- pgdata:/var/lib/postgresql/data:Z
+					volumes:
+						pgdata:</code></pre>
+						<p>Mixing host volumes and named volumes</p>
+					</section>
+					
+					<section>
+						<h2>Development Example: Live Code Reloading</h2>
+						<pre><code class="language-yaml">
+					version: '3'
+					services:
+						node-app:
+							image: node:14
+							working_dir: /app
+							volumes:
+							- ./src:/app/src:Z
+							- ./package.json:/app/package.json:Z
+							command: npm run dev
+							ports:
+							- "3000:3000"</code></pre>
+						<p>
+							<img src="assets/img/memes/chris-pratt-omg.gif" class="fragment" />
+						</p>
+					</section>
+					<section>
+						<h2>Best Practices for Host Volumes</h2>
+						<ul>
+							<li class="fragment">Use for development environments and quick prototyping</li>
+							<li class="fragment">Be cautious with permissions, especially in production</li>
+							<li class="fragment">Use read-only mounts when possible for improved security</li>
+							<li class="fragment">Consider SELinux implications and use :z or :Z options</li>
+							<li class="fragment">Prefer named volumes for production deployments</li>
+							<li class="fragment">Document host volume requirements for your application</li>
+						</ul>
+					</section>
+					<section>
+						<h2>Host Volumes vs Named Volumes</h2>
+						<div style="display: flex; justify-content: space-around;">
+							<div>
+								<h3>Host Volumes</h3>
+								<ul class="fragment">
+									<li>Direct access to host filesystem</li>
+									<li>Easy file sharing between host and container</li>
+									<li>Ideal for development environments</li>
+									<li>Can have permission issues</li>
+									<li>Less portable across different hosts</li>
+								</ul>
+							</div>
+							<div>
+								<h3>Named Volumes</h3>
+								<ul class="fragment">
+									<li>Managed by Podman</li>
+									<li>More portable and easier to backup</li>
+									<li>Better performance in some cases</li>
+									<li>Ideal for production use</li>
+									<li>Easier to manage with Podman commands</li>
+								</ul>
+							</div>
+						</div>
+					</section>
+					<section>
+						<h2>Practical Example: Web Server with Host Volume</h2>
+						<pre><code class="language-bash">
+					# Create a simple HTML file
+					echo "&lt;h1&gt;Hello from host volume!&lt;/h1&gt;" > index.html
+					
+					# Run Nginx with the current directory mounted
+					podman run -d --name nginx-host-volume \
+					-v ${PWD}:/usr/share/nginx/html:ro,Z \
+					-p 8080:80 \
+					nginx:alpine
+					
+					# Access the website
+					curl http://localhost:8080
+					
+					# Update the file on the host
+					echo "&lt;h1&gt;Updated content!&lt;/h1&gt;" > index.html
+					
+					# Check the updated content
+					curl http://localhost:8080</code></pre>
+					</section>
+				</section>
+				<section>
+					<section class="img_container">
+						<h2>Container Layers</h2>
+						<img src="assets/diagrams/container-layers.excalidraw.png" class="fragment" />
+						<p class="fragment">Each layer is read-only except the top writable layer</p>
+					</section>
+					<section>
+						<h2>Container Layers</h2>
+						<ul>
+							<li class="fragment">Layers are cached and reusable across containers</li>
+							<li class="fragment">Reduces storage usage and speeds up builds</li>
+							<li class="fragment">Changes are stored in the writable layer</li>
+							<li class="fragment">Layers use Copy-on-Write (CoW) strategy</li>
+							<li class="fragment">Efficient for shipping and versioning</li>
+						</ul>
+					</section>
+					<section class="img_container">
+						<h2>Layers in Action</h2>
+						<script src="https://asciinema.org/a/620513.js" id="asciicast-620513" async="true"></script>
+					</section>
+					<section class="img_container">
+						<h2>Layers in Action</h2>
+						<script src="https://asciinema.org/a/674363.js" id="asciicast-674363" async="true"></script>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h3>Advanced Container Concepts</h3>
+						<ul>
+							<li class="fragment">Container Networking</li>
+							<li class="fragment">Advanced Layer Management</li>
+							<li class="fragment">Container Security / Secrets</li>
+							<li class="fragment">Container Orchestration</li>
+							<li class="fragment">Container Monitoring</li>
+						</ul>
+					</section>
+					<section>
+						<h2>Container Networking</h2>
+						<ul>
+							<li class="fragment"><strong>Bridge:</strong> Default network mode, creates isolated network for containers</li>
+							<li class="fragment"><strong>Host:</strong> Shares host's network stack, higher performance but less isolation</li>
+							<li class="fragment"><strong>Overlay:</strong> Enables communication between containers across multiple hosts</li>
+							<li class="fragment"><strong>Macvlan:</strong> Assigns MAC address to container, appears as physical device on network</li>
+							<li class="fragment"><strong>None:</strong> Disables networking for maximum isolation</li>
+							<li class="fragment"><strong>DEMO:</strong> demo/advanced-networking </li>
+						</ul>
+					</section>				
+					<section>
+						<h2>Advanced Layer Management</h2>
+						<ul>
+							<li class="fragment">Multi-stage builds to optimize final image size</li>
+							<li class="fragment">Layer caching strategies for faster builds</li>
+							<li class="fragment">Squashing layers to reduce image size</li>
+							<li class="fragment">Using .dockerignore to exclude unnecessary files</li>
+							<li class="fragment">Leveraging BuildKit for advanced caching and concurrent building</li>
+							<li class="fragment"><strong>DEMO:</strong> demo/layer-demo[1...4] </li>
+						</ul>
+					</section>
+					<section>
+						<h3>Podman Secret Management</h3>
+						<ul>
+							<li>Create secrets: <code>podman secret create</code></li>
+							<li>List secrets: <code>podman secret ls</code></li>
+							<li>Inspect secrets: <code>podman secret inspect</code></li>
+							<li>Use in containers: <code>--secret</code> flag</li>
+						</ul>
+						<pre><code class="language-bash">podman secret create my_secret my_secret.txt
+	podman run --secret my_secret myimage</code></pre>
+					</section>
+					<section>
+						<h3>Podman System Connection</h3>
+						<ul>
+							<li>Manage remote Podman instances</li>
+							<li>Add connections: <code>podman system connection add</code></li>
+							<li>List connections: <code>podman system connection list</code></li>
+							<li>Use remote connection: <code>podman -r &lt;name&gt; &lt;command&gt;</code></li>
+						</ul>
+						<pre><code class="language-bash">podman system connection add myserver --identity ~/.ssh/id_rsa user@example.com
+	podman -r myserver images</code></pre>
+					</section>
+					<section>
+						<h2>Tips and Tricks for Podman (Non-Kubernetes)</h2>
+						<ul>
+							<li>Use <code>podman-compose</code> for Docker Compose compatibility</li>
+							<li>Leverage <code>podman auto-update</code> for automatic container updates</li>
+							<li>Utilize <code>podman generate systemd</code> for service management</li>
+							<li>Explore <code>podman image sign</code> for image signing and verification</li>
+							<li>Use <code>podman save/load</code> for image portability</li>
+						</ul>
+					</section>
+					</section>
+					<section>
+						<section>
+							<h3>Local Kubernetes Development with Podman</h3>
+							<ul>
+								<li>Test K8s deployments locally</li>
+								<li>Simulate multi-container pods</li>
+								<li>Validate container interactions</li>
+								<li>Prototype K8s manifests</li>
+							</ul>
+						</section>
+						<section>
+							<h3>Kubernetes-like Features in Podman</h3>
+							<ul>
+								<li>Pod-native operations</li>
+								<li>Network namespaces similar to K8s pods</li>
+								<li>Container health checks</li>
+								<li>Resource constraints (CPU, memory)</li>
+							</ul>
+						</section>
+						<section>
+							<h3>Podman and Kubernetes Integration</h3>
+							<ul>
+								<li>Generate Kubernetes YAML: <code>podman generate kube</code></li>
+								<li>Play Kubernetes YAML: <code>podman play kube</code></li>
+								<li>Create pods: <code>podman pod create</code></li>
+								<li>Manage pods: <code>podman pod start/stop/rm</code></li>
+							</ul>
+						</section>
+					</section>
+					<section>
+						<section>
+							<h2>Compatibility Issues and Limitations</h2>
+						</section>
+						<section>
+							<h3>Docker Compose vs Podman Compose</h3>
+							<ul>
+								<li>Volume syntax differences</li>
+								<li>Network mode limitations</li>
+								<li>Some Docker-specific options not supported</li>
+								<li>Differences in environment variable expansion</li>
+							</ul>
+							<pre><code class="language-yaml"># Docker Compose
+	volumes:
+	- /host/path:/container/path
+
+	# Podman Compose
+	volumes:
+	- /host/path:/container/path:Z</code></pre>
+						</section>
+						<section>
+							<h3>Performance Differences</h3>
+							<ul>
+								<li>Rootless mode may have slower I/O performance</li>
+								<li>Networking in rootless mode can be slower</li>
+								<li>Volume mounts may have higher overhead in rootless mode</li>
+								<li>Container startup time may vary</li>
+							</ul>
+						</section>
+						<section>
+							<h3>Network Limitations in Rootless Mode</h3>
+							<ul>
+								<li>Limited access to low-numbered ports (&lt;1024)</li>
+								<li>NAT slirp4netns used instead of bridge networking</li>
+								<li>Potential issues with container-to-host communication</li>
+								<li>Some network drivers may not be available</li>
+							</ul>
+							<pre><code class="language-bash"># Workaround for low-numbered ports
+	podman run --network slirp4netns:port_handler=slirp4netns ...</code></pre>
+						</section>
+					</section>
+					<section>
+						<h3>Q&A: With Patricia Kar..Thushan Fernando</h3>
+					</section>
+			</section>
 		</div>
 	</div>
 
@@ -82,6 +1058,90 @@
 			},
 			plugins: [RevealMarkdown, RevealHighlight, RevealNotes, RevealChart, RevealChalkboard, RevealMermaid]
 		});
+	</script>
+	<script>
+		/***
+		 * TimelineBling v2.19.2
+		 * @github/thushan/revealjs-timelinebling
+		 * Copyright 2008-2022 Thushan Fernando		 
+		 * 
+		 * Create a timeline with events and content
+		 **/
+		function createTimeline() {
+			const timeline = document.querySelector('.timeline');
+			const startYear = 1960;
+			const endYear = 2020;
+			const timelineWidth = timeline.offsetWidth;
+			const decadeColors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F06292', '#AED581'];
+
+			for (let year = startYear; year <= endYear; year++) {
+				const yearMarker = document.createElement('div');
+				yearMarker.className = 'year-marker';
+				yearMarker.style.left = `${((year - startYear) / (endYear - startYear)) * 100}%`;
+				timeline.appendChild(yearMarker);
+
+				if (year % 10 === 0) {
+					const decadeIndex = Math.floor((year - startYear) / 10);
+					const decadeMarker = document.createElement('div');
+					decadeMarker.className = 'decade-marker';
+					decadeMarker.style.left = `${((year - startYear) / (endYear - startYear)) * 100}%`;
+					decadeMarker.style.backgroundColor = decadeColors[decadeIndex % decadeColors.length];
+					timeline.appendChild(decadeMarker);
+
+					const decadeLabelBottom = document.createElement('div');
+					decadeLabelBottom.className = 'decade-label-bottom';
+					decadeLabelBottom.textContent = year;
+					decadeLabelBottom.style.left = `${((year - startYear) / (endYear - startYear)) * 100}%`;
+					timeline.appendChild(decadeLabelBottom);
+				}
+			}
+
+			timelineEvents.forEach(event => {
+				const eventElement = document.createElement('div');
+				eventElement.className = 'event';
+				eventElement.style.left = `${((event.year - startYear) / (endYear - startYear)) * 100}%`;
+				eventElement.addEventListener('click', () => updateContent(event));
+				timeline.appendChild(eventElement);
+			});
+
+			updateContent(timelineEvents[0]);
+		}
+
+		function updateContent(event) {
+			const contentArea = document.querySelector('.content-area');
+			const imageArea = document.querySelector('.image-area');
+			const textArea = document.querySelector('.text-area');
+			const title = document.querySelector('.event-title');
+			const description = document.querySelector('.event-description');
+			
+			title.textContent = `${event.year}: ${event.title}`;
+			description.textContent = event.description;
+
+			if (event.image) {
+				imageArea.innerHTML = `<img src="${event.image}" alt="${event.title}">`;
+				imageArea.style.display = 'flex';
+				textArea.classList.remove('full-width');
+				if (event.imagePosition === 'right') {
+					contentArea.insertBefore(textArea, imageArea);
+				} else {
+					contentArea.insertBefore(imageArea, textArea);
+				}
+			} else {
+				imageArea.style.display = 'none';
+				textArea.classList.add('full-width');
+			}
+			document.querySelectorAll('.event').forEach(el => el.classList.remove('active'));
+			// Manually fix this for now, not sure why it's not working all of a sudden
+			document.querySelector(`.event[style*="left: ${((event.year - 1960) / (2020 - 1960)) * 100}%"]`).classList.add('active');
+		}
+
+		Reveal.addEventListener('slidechanged', function(event) {
+			if (event.currentSlide.querySelector('.timeline-container')) {
+				createTimeline();
+			}
+		});
+
+		window.addEventListener('load', createTimeline);
 	</script>
 </body>
 
