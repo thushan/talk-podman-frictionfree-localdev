@@ -1,11 +1,19 @@
 # Talk: Mastering Containers with Podman
+[![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
+![Updated](https://img.shields.io/github/last-commit/thushan/talk-podman-frictionfree-localdev)
+![Presentation](https://img.shields.io/badge/Version-v2024.09-blue)
+![Podman Badge](https://img.shields.io/badge/Podman-892CA0?logo=podman&logoColor=fff&style=flat-square)
+![Docker Badge](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=fff&style=flat-square)
 
 Presentation covering the use of containers for local development to enable a Friction-Free development experience.
-
+https://podman-desktop.io/img/logo.svg
 
 ## Getting Started
 
 You can open this project within VSCode and preview internally or externally the `index.html` file which includes the full presentation slides + memes & examples.
+
+
+[![Operating Systems](https://img.shields.io/badge/View-Presentation%20Online%20Right%20Now-informational?style=for-the-badge)](https://htmlpreview.github.io/?https://github.com/thushan/talk-podman-frictionfree-localdev/blob/main/index.html)
 
 ## Changelog
 This talk has been revised over the years - whilst the content and overall idea has stayed relatively the same.
